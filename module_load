@@ -1,0 +1,25 @@
+#!/bin/bash
+
+TOOLS_PATH="/cluster/bin"
+MNT=$TOOLS_PATH/mount_image
+UMNT=$TOOLS_PATH/umount_image
+
+## Exit if we have disabled mounting of software images:
+if [[ ! -e /cluster/etc/use_software_images ]]; then
+    exit 0
+fi
+
+if [[ $# < 3 ]]; then
+    echo usage: module_load.sh [module_name] [job_id] [action]
+    exit 1
+fi
+
+# in case there is no sudoers file, sudo will fail without asking for password.
+# as a result, image will not be (un)mounted
+if [[ $3 == "load" ]]; then
+    sudo -n $MNT $1 --job_id $2 2>&1
+fi
+
+if [[ $3 == "remove" ]]; then
+    sudo -n $UMNT $1 --job_id $2 2>&1
+fi
